@@ -1,10 +1,3 @@
-// script.js — improved version
-// - case-insensitive search (name + bio)
-// - debounce on input
-// - shows all users when input is empty
-// - shows "No results found" when nothing matches
-// - small accessibility and performance tweaks (lazy images, alt text)
-
 const users = [
   { name: "amisha rathore", pic: "https://i.pinimg.com/736x/cd/9b/1c/cd9b1cf5b96e8300751f952488d6c002.jpg", bio: "silent chaos in a loud world 🌑🖤 | not for everyone" },
   { name: "amita mehta",   pic: "https://i.pinimg.com/736x/1f/2f/85/1f2f856bf3a020ed8ee9ecb3306ae074.jpg", bio: "main character energy 🎬 | coffee > everything ☕✨" },
@@ -15,101 +8,59 @@ const users = [
   { name: "mohit chhabra",  pic: "https://i.pinimg.com/736x/22/8b/cf/228bcf5a0800f813cd1744d4ccbf01ea.jpg", bio: "aesthetic overload 📸🕊️ | living in lowercase" }
 ];
 
-const cardsContainer = document.querySelector(".cards");
-const inp = document.querySelector(".inp");
 
-// Debounce helper: wait until user stops typing
-function debounce(fn, delay = 180) {
-  let timer;
-  return (...args) => {
-    clearTimeout(timer);
-    timer = setTimeout(() => fn(...args), delay);
-  };
-}
 
-// Build a single card element
-function createCard(user) {
-  const card = document.createElement("div");
-  card.className = "card";
-  card.setAttribute("role", "listitem");
-  card.tabIndex = 0;
+// 1️⃣ Create main container and input
+const mainDiv = document.createElement('div');
+mainDiv.className = "flex flex-col gap-10 items-center";
+document.body.appendChild(mainDiv);
 
-  const img = document.createElement("img");
-  img.className = "bg-img";
-  img.src = user.pic;
-  img.alt = user.name;
-  img.loading = "lazy"; // performance: lazy-load images
+// 2️⃣ Function to render cards
+function showAllUsers(arr){
+  // Remove old cards if exist
+  const oldCards = document.querySelector('.cards');
+  if(oldCards) oldCards.remove();
 
-  const blurredLayer = document.createElement("div");
-  blurredLayer.className = "blurred-layer";
-  blurredLayer.style.backgroundImage = `url(${user.pic})`;
+  // Cards container
+  const cardsDiv = document.createElement('div');
+  cardsDiv.className = "cards flex gap-10";
 
-  const content = document.createElement("div");
-  content.className = "content";
+  arr.forEach(user => {
+    const cardDiv = document.createElement('div');
+    cardDiv.className = "card";
 
-  const heading = document.createElement("h3");
-  heading.textContent = user.name;
+    const img = document.createElement('img');
+    img.src = user.pic;
+    img.className = "bg-img";
+    img.alt = user.name;
 
-  const para = document.createElement("p");
-  para.textContent = user.bio;
+    const contentDiv = document.createElement('div');
+    contentDiv.className = "content";
 
-  content.appendChild(heading);
-  content.appendChild(para);
+    const h3 = document.createElement('h3');
+    h3.textContent = user.name;
 
-  card.appendChild(img);
-  card.appendChild(blurredLayer);
-  card.appendChild(content);
+    const p = document.createElement('p');
+    p.textContent = user.bio;
 
-  // Example keyboard action: Enter to trigger click
-  card.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") card.click();
+    contentDiv.append(h3, p);
+    cardDiv.append(img, contentDiv);
+    cardsDiv.appendChild(cardDiv);
   });
 
-  // Example click action: alert (replace with real navigation/modal)
-  card.addEventListener("click", (e) => {
-    e.preventDefault();
-    alert(`${user.name}\n\n${user.bio}`);
-  });
-
-  return card;
+  mainDiv.appendChild(cardsDiv);
 }
 
-// Render list of users (array)
-function render(list) {
-  cardsContainer.innerHTML = ""; // clear previous
-  cardsContainer.setAttribute("role", "list");
+// Call function
+showAllUsers(users);
 
-  if (!list.length) {
-    const message = document.createElement("p");
-    message.style.color = "rgba(255,255,255,0.8)";
-    message.textContent = "No results found.";
-    cardsContainer.appendChild(message);
-    return;
-  }
+let input = document.querySelector('input');
+input.addEventListener('input', () => {
+  let filteredUsers = users.filter((user) => {
+    return user.name.toLowerCase().includes(input.value.toLowerCase().trim()) || user.bio.toLowerCase().includes(input.value.toLowerCase().trim());
+  })
+  showAllUsers(filteredUsers);
+});
 
-  // Use DocumentFragment for performance
-  const frag = document.createDocumentFragment();
-  list.forEach(user => frag.appendChild(createCard(user)));
-  cardsContainer.appendChild(frag);
-}
 
-// Case-insensitive filter on name and bio
-function filterUsers(query) {
-  const q = query.trim().toLowerCase();
-  if (!q) return users.slice(); // return all if query empty
 
-  return users.filter(u => {
-    return u.name.toLowerCase().includes(q) || (u.bio && u.bio.toLowerCase().includes(q));
-  });
-}
-
-// Input handler (debounced)
-const onInput = debounce((e) => {
-  const value = e.target.value;
-  const matched = filterUsers(value);
-  render(matched);
-}, 180);
-
-// Init
-inp.addEventListener("input", onInput);
-render(users); // initial render: show all
