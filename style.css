@@ -1,0 +1,138 @@
+:root{
+  --card-w: 200px;
+  --img-h: 300px;
+  --radius: 14px;
+  --accent: rgba(99,102,241,0.95);
+}
+body{
+    background-color: black;
+}
+
+/* Container: keep horizontal flow */
+.cards{
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 12px;
+  box-sizing: border-box;
+}
+
+/* Card base */
+.card{
+  width: var(--card-w);
+  border-radius: var(--radius);
+  overflow: hidden;
+  position: relative;
+  background: linear-gradient(180deg, rgb(11, 11, 11), rgba(0, 0, 0, 0));
+  transition: transform .18s ease, box-shadow .18s ease;
+  cursor: pointer;
+  display: block;
+  flex: 0 0 var(--card-w);
+}
+
+/* Hover lift + stronger shadow */
+.card:hover{
+  transform: translateY(-8px) scale(1.01);
+  box-shadow: 0 18px 50px rgba(230, 230, 232, 0.114);
+}
+
+/* Main image on top */
+.bg-img{
+  width: 100%;
+  height: var(--img-h);
+  object-fit: cover;
+  display: block;
+  vertical-align: middle;
+  transition: transform .28s ease;
+}
+
+/* subtle zoom on hover */
+.card:hover .bg-img{ transform: scale(1.04); }
+
+/* blurred layer (frosted effect) */
+.blurred-layer{
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  filter: blur(14px) saturate(120%);
+  opacity: .35;
+  z-index: 1;
+  pointer-events: none;
+  -webkit-mask-image: linear-gradient(to top, rgba(0,0,0,1), rgba(0,0,0,0));
+  mask-image: linear-gradient(to top, rgba(0,0,0,1), rgba(0,0,0,0));
+}
+
+/* overlay gradient to give contrast to text */
+.card::after{
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 55%;
+  background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.6) 100%);
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* content sits above blur & overlay */
+.content{
+  position: absolute;
+  z-index: 2;
+  left: 16px;
+  right: 16px;
+  bottom: 16px;
+  color: #fff;
+  text-shadow: 0 3px 18px rgba(0,0,0,0.6);
+}
+
+/* title + bio */
+.content h3{
+  margin: 0 0 6px 0;
+  font-size: 18px;
+  letter-spacing: .2px;
+  font-weight: 700;
+}
+.content p{
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.35;
+  color: rgba(255,255,255,0.92);
+  opacity: .95;
+}
+
+/* small badge (optional) — placed top-left */
+.card .badge {
+  position: absolute;
+  left: 12px;
+  top: 12px;
+  z-index: 3;
+  background: rgba(0,0,0,0.45);
+  color: #fff;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  backdrop-filter: blur(6px);
+}
+
+
+
+/* responsive tweaks */
+@media (max-width: 720px){
+  :root{ --card-w: 92%; --img-h: 260px; }
+  .cards{ gap: 14px; }
+}
+
+.inp{
+  margin-left: 45%;
+  margin-right: 45%;
+  margin-top: 2%;
+  margin-bottom: 1%;
+  border: oldlace solid 2px;
+  border-radius: 10px;
+  padding: 10px;
+  background-color: black;
+  color: white;
+}
